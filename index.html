@@ -1,197 +1,668 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- SEO Meta Tags -->
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Akash Kumar - Web Developer Portfolio">
-    <meta name="keywords" content="Portfolio, HTML5, CSS3, JavaScript, Web Developer">
-    <meta name="author" content="Akash Kumar">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thiranex · Portfolio & Task Manager</title>
+  
+  <!-- SEO & Accessibility Meta -->
+  <meta name="description" content="Full-stack portfolio & task manager built for Thiranex internship. Semantic HTML5, WCAG accessible, responsive CSS3, and interactive JS with localStorage.">
+  <meta name="theme-color" content="#1a1a2e">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+  
+  <!-- Font & Icons (optional but clean) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  
+  <style>
+    /* ---------- CSS Variables (light/dark) ---------- */
+    :root {
+      --bg-page: #f5f7fc;
+      --bg-card: #ffffff;
+      --bg-header: #1a1a2e;
+      --text-primary: #1e1e2f;
+      --text-secondary: #2d2d44;
+      --text-muted: #5a5a7a;
+      --accent: #4f46e5;
+      --accent-soft: #e0e7ff;
+      --border: #d1d9e6;
+      --shadow: 0 12px 30px rgba(0,0,0,0.08);
+      --radius: 1.25rem;
+      --transition: 0.25s ease;
+      --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
 
-    <title>Akash Kumar | Portfolio</title>
+    [data-theme="dark"] {
+      --bg-page: #0f0f1a;
+      --bg-card: #1b1b2e;
+      --bg-header: #0b0b16;
+      --text-primary: #ececf5;
+      --text-secondary: #c8c8e0;
+      --text-muted: #9898b8;
+      --accent: #7c7aff;
+      --accent-soft: #2d2d5e;
+      --border: #3a3a5a;
+      --shadow: 0 12px 30px rgba(0,0,0,0.6);
+    }
 
-    <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/responsive.css">
+    /* ---------- Reset & Base ---------- */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: var(--font);
+      background: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 1.5rem;
+      transition: background var(--transition), color var(--transition);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ---------- Layout Grid (CSS Grid) ---------- */
+    .app-wrapper {
+      max-width: 1300px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @media (min-width: 900px) {
+      .app-wrapper {
+        grid-template-columns: 3fr 2fr;
+      }
+    }
+
+    /* ---------- Cards ---------- */
+    .card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 1.8rem 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      transition: background var(--transition), border var(--transition), box-shadow var(--transition);
+    }
+
+    /* ---------- Header / Hero ---------- */
+    .hero {
+      grid-column: 1 / -1;
+      background: var(--bg-header);
+      color: white;
+      border-radius: var(--radius);
+      padding: 2rem 2.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      border: none;
+    }
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero h1 small {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #a5b4fc;
+      margin-left: 0.5rem;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 1.2rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 0.6rem 1.4rem;
+      border-radius: 3rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border: 1px solid transparent;
+      font-size: 0.95rem;
+      text-decoration: none;
+    }
+    .btn-outline {
+      background: transparent;
+      border-color: rgba(255,255,255,0.4);
+      color: white;
+    }
+    .btn-outline:hover {
+      background: rgba(255,255,255,0.08);
+      border-color: white;
+    }
+    .btn:hover {
+      transform: scale(1.02);
+      filter: brightness(1.1);
+    }
+    .btn-dark-toggle {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: white;
+      border-radius: 3rem;
+      padding: 0.5rem 1.2rem;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-dark-toggle:hover {
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ---------- Task list (semantic) ---------- */
+    .task-filters {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin: 1.2rem 0 1.8rem 0;
+    }
+    .task-filters button {
+      background: var(--bg-page);
+      border: 1px solid var(--border);
+      padding: 0.4rem 1.2rem;
+      border-radius: 3rem;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--text-secondary);
+      transition: 0.15s;
+    }
+    .task-filters button.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+    .task-filters button:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .task-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 1.5rem 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      background: var(--bg-page);
+      padding: 0.7rem 1.2rem;
+      border-radius: 3rem;
+      border: 1px solid var(--border);
+      transition: 0.15s;
+    }
+    .task-item input[type="checkbox"] {
+      width: 1.3rem;
+      height: 1.3rem;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .task-item .task-text {
+      flex: 1;
+      font-weight: 450;
+      word-break: break-word;
+    }
+    .task-item .task-text.completed {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+    .task-item .delete-btn {
+      background: transparent;
+      border: none;
+      color: #b91c1c;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0 0.3rem;
+      opacity: 0.6;
+      transition: 0.15s;
+    }
+    .task-item .delete-btn:hover {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+    .add-task-form {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .add-task-form input {
+      flex: 1;
+      min-width: 180px;
+      padding: 0.7rem 1.2rem;
+      border-radius: 3rem;
+      border: 1px solid var(--border);
+      background: var(--bg-page);
+      color: var(--text-primary);
+      font-size: 1rem;
+    }
+    .add-task-form input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .add-task-form button {
+      background: var(--accent);
+      border: none;
+      color: white;
+      padding: 0.7rem 1.8rem;
+      border-radius: 3rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    /* ---------- Internship tasks (completed) ---------- */
+    .completion-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-top: 0.8rem;
+    }
+    .completion-item {
+      border-left: 4px solid var(--accent);
+      padding-left: 1.2rem;
+      background: var(--bg-page);
+      border-radius: 0.8rem;
+      padding: 1rem 1.2rem;
+      transition: 0.15s;
+    }
+    .completion-item h4 {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 0.2rem;
+    }
+    .badge {
+      background: var(--accent);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.8rem;
+      border-radius: 3rem;
+      letter-spacing: 0.3px;
+    }
+    .badge-ok {
+      background: #16a34a;
+    }
+    .badge-overdue {
+      background: #b91c1c;
+    }
+
+    /* ---------- Footer ---------- */
+    .footer-note {
+      grid-column: 1 / -1;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding-top: 0.5rem;
+      border-top: 1px solid var(--border);
+      margin-top: 0.5rem;
+    }
+
+    /* ---------- Utilities ---------- */
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .mt-1 { margin-top: 1rem; }
+    .mb-1 { margin-bottom: 0.8rem; }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0); border: 0;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ---------- Responsive (mobile-first) ---------- */
+    @media (max-width: 600px) {
+      .hero { flex-direction: column; align-items: start; gap: 1rem; }
+      .hero h1 { font-size: 1.8rem; flex-wrap: wrap; }
+      .card { padding: 1.2rem; }
+      .task-item { flex-wrap: wrap; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app-wrapper" role="main">
 
-<a class="skip-link" href="#main-content">Skip to Main Content</a>
-
-<header>
-
-    <div class="container">
-
-        <h1 class="logo">Akash Kumar</h1>
-
-        <nav aria-label="Main Navigation">
-
-            <ul class="nav-links">
-
-                <li><a href="index.html" aria-current="page">Home</a></li>
-
-                <li><a href="about.html">About</a></li>
-
-                <li><a href="projects.html">Projects</a></li>
-
-                <li><a href="contact.html">Contact</a></li>
-
-            </ul>
-
-        </nav>
-
-        <button
-        id="theme-toggle"
-        aria-label="Toggle Dark Mode">
-            🌙
+    <!-- ===== HEADER ===== -->
+    <header class="hero" role="banner" aria-label="Main header">
+      <h1>
+        <span role="img" aria-hidden="true">🧠</span> Thiranex
+        <small>· Skill &amp; Future Tech</small>
+      </h1>
+      <div class="hero-actions">
+        <button class="btn-dark-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Switch theme">
+          <i class="fas fa-moon" aria-hidden="true"></i>
         </button>
+        <a href="#" class="btn btn-outline" aria-label="Download offer letter (simulated)">
+          <i class="fas fa-file-pdf" aria-hidden="true"></i> Offer Letter
+        </a>
+        <a href="#" class="btn btn-outline" aria-label="Share on LinkedIn (simulated)">
+          <i class="fab fa-linkedin" aria-hidden="true"></i> Post
+        </a>
+      </div>
+    </header>
 
-    </div>
+    <!-- ===== LEFT COLUMN: Portfolio Tasks (Internship) ===== -->
+    <section class="card" aria-labelledby="portfolio-heading">
+      <h2 id="portfolio-heading" class="flex-between">
+        <span>📋 Portfolio Milestones</span>
+        <span style="font-size:0.85rem; font-weight:400; color:var(--text-muted);">WCAG · SEO · responsive</span>
+      </h2>
 
-</header>
+      <div class="completion-grid">
+        <!-- Task 1 -->
+        <article class="completion-item" aria-label="HTML5 Semantic Structure completed">
+          <h4>
+            <span>✅ HTML5 Semantic &amp; Accessibility</span>
+            <span class="badge badge-ok">Submitted</span>
+          </h4>
+          <p style="font-size:0.9rem; color:var(--text-secondary);">
+            <i class="fas fa-tag" aria-hidden="true"></i> Semantic tags, ARIA, SEO meta, accessible form.
+            <br><span style="color:var(--text-muted);">Due: Immediate Submission · Completed</span>
+          </p>
+        </article>
 
-<main id="main-content">
+        <!-- Task 2 -->
+        <article class="completion-item" aria-label="Advanced CSS3 completed">
+          <h4>
+            <span>✅ Advanced CSS3 &amp; Responsive</span>
+            <span class="badge badge-ok">Submitted</span>
+          </h4>
+          <p style="font-size:0.9rem; color:var(--text-secondary);">
+            <i class="fas fa-palette" aria-hidden="true"></i> CSS Grid, Flexbox, mobile-first, light/dark vars.
+            <br><span style="color:var(--text-muted);">Due: 15 Jun 2026 · on track</span>
+          </p>
+        </article>
 
-    <!-- HERO -->
+        <!-- Task 3 -->
+        <article class="completion-item" aria-label="JavaScript Task Manager">
+          <h4>
+            <span>📌 JavaScript Logic &amp; State</span>
+            <span class="badge badge-overdue">Overdue 16d</span>
+          </h4>
+          <p style="font-size:0.9rem; color:var(--text-secondary);">
+            <i class="fas fa-tasks" aria-hidden="true"></i> CRUD, localStorage, filtering (All/Active/Completed).
+            <br><span style="color:var(--text-muted);">Due: 22 Jun 2026 · overdue</span>
+          </p>
+        </article>
+      </div>
 
-    <section class="hero">
-
-        <div class="hero-content">
-
-            <h2>Hello, I'm Akash Kumar 👋</h2>
-
-            <p>
-
-                Aspiring Front-End Web Developer passionate about building
-                responsive, accessible and modern websites.
-
-            </p>
-
-            <a href="projects.html" class="btn">
-
-                View My Projects
-
-            </a>
-
-        </div>
-
-        <div class="hero-image">
-
-            <img
-            src="images/profile.jpg"
-            alt="Akash Kumar Profile Photo">
-
-        </div>
-
+      <!-- Accessible contact form (semantic) -->
+      <hr style="border-color:var(--border); margin:1.5rem 0 1rem 0;">
+      <h3 id="contact-heading" style="font-weight:500; margin-bottom:0.5rem;"><i class="fas fa-envelope" aria-hidden="true"></i> Get in touch</h3>
+      <form aria-labelledby="contact-heading" class="add-task-form" style="margin-top:0.2rem;" novalidate>
+        <label for="contactName" class="sr-only">Your name</label>
+        <input type="text" id="contactName" placeholder="Name" aria-required="true" required>
+        <label for="contactEmail" class="sr-only">Email address</label>
+        <input type="email" id="contactEmail" placeholder="Email" aria-required="true" required>
+        <button type="submit" class="btn" aria-label="Send message">Send <i class="fas fa-arrow-right" aria-hidden="true"></i></button>
+      </form>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.3rem;"><i class="fas fa-keyboard" aria-hidden="true"></i> Fully tab-navigable, ARIA labels included.</p>
     </section>
 
-    <!-- SKILLS -->
+    <!-- ===== RIGHT COLUMN: Todo Manager (JS) ===== -->
+    <section class="card" aria-labelledby="todo-heading">
+      <h2 id="todo-heading" class="flex-between">
+        <span>📌 Task Manager</span>
+        <span style="font-size:0.85rem; font-weight:400; color:var(--text-muted);">localStorage · CRUD</span>
+      </h2>
 
-    <section>
+      <!-- Filters (All / Active / Completed) -->
+      <div class="task-filters" role="group" aria-label="Task filters">
+        <button class="active" data-filter="all" aria-pressed="true">All</button>
+        <button data-filter="active" aria-pressed="false">Active</button>
+        <button data-filter="completed" aria-pressed="false">Completed</button>
+      </div>
 
-        <h2>Skills</h2>
+      <!-- Task list (dynamic) -->
+      <ul class="task-list" id="taskList" role="list" aria-label="Task list">
+        <!-- JS will populate -->
+      </ul>
 
-        <div class="card-grid">
-
-            <article class="card">
-
-                <h3>HTML5</h3>
-
-                <p>
-                    Semantic HTML & Accessibility
-                </p>
-
-            </article>
-
-            <article class="card">
-
-                <h3>CSS3</h3>
-
-                <p>
-                    Flexbox, Grid & Responsive Design
-                </p>
-
-            </article>
-
-            <article class="card">
-
-                <h3>JavaScript</h3>
-
-                <p>
-                    Interactive User Interfaces
-                </p>
-
-            </article>
-
-            <article class="card">
-
-                <h3>Git & GitHub</h3>
-
-                <p>
-                    Version Control
-                </p>
-
-            </article>
-
-        </div>
-
+      <!-- Add task form -->
+      <form class="add-task-form" id="addTaskForm" aria-label="Add new task">
+        <label for="taskInput" class="sr-only">New task description</label>
+        <input type="text" id="taskInput" placeholder="Write a new task…" autocomplete="off" required>
+        <button type="submit" aria-label="Add task">Add</button>
+      </form>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-top:0.4rem;">
+        <i class="fas fa-database" aria-hidden="true"></i> Persists in browser (localStorage).
+      </p>
     </section>
 
-    <!-- FEATURED PROJECTS -->
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer-note" role="contentinfo">
+      <p>© 2026 Thiranex · Built with semantic HTML5, ARIA, CSS Grid/Flexbox, and vanilla JS.</p>
+    </footer>
+  </div>
 
-    <section>
+  <script>
+    (function() {
+      "use strict";
 
-        <h2>Featured Projects</h2>
+      // ---------- THEME TOGGLE (light/dark) ----------
+      const themeToggle = document.getElementById('themeToggle');
+      const html = document.documentElement;
+      // check stored theme
+      const storedTheme = localStorage.getItem('thiranex-theme');
+      if (storedTheme) {
+        html.setAttribute('data-theme', storedTheme);
+        updateThemeIcon(storedTheme);
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('thiranex-theme', 'dark');
+        updateThemeIcon('dark');
+      } else {
+        html.setAttribute('data-theme', 'light');
+        localStorage.setItem('thiranex-theme', 'light');
+        updateThemeIcon('light');
+      }
 
-        <div class="card-grid">
+      function updateThemeIcon(theme) {
+        if (theme === 'dark') {
+          themeToggle.innerHTML = '<i class="fas fa-sun" aria-hidden="true"></i>';
+        } else {
+          themeToggle.innerHTML = '<i class="fas fa-moon" aria-hidden="true"></i>';
+        }
+      }
 
-            <article class="card">
+      themeToggle.addEventListener('click', function() {
+        const current = html.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('thiranex-theme', next);
+        updateThemeIcon(next);
+      });
 
-                <h3>Portfolio Website</h3>
+      // ---------- TASK MANAGER (CRUD + localStorage + filtering) ----------
+      const taskListEl = document.getElementById('taskList');
+      const addForm = document.getElementById('addTaskForm');
+      const taskInput = document.getElementById('taskInput');
+      const filterButtons = document.querySelectorAll('.task-filters button');
 
-                <p>
-                    Responsive Portfolio Website using HTML5 & CSS3.
-                </p>
+      let tasks = [];
+      let currentFilter = 'all'; // 'all', 'active', 'completed'
 
-            </article>
+      // Load from localStorage
+      function loadTasks() {
+        const stored = localStorage.getItem('thiranex-tasks');
+        if (stored) {
+          try {
+            tasks = JSON.parse(stored);
+          } catch(e) { tasks = []; }
+        } else {
+          // seed with sample tasks
+          tasks = [
+            { id: '1', text: 'Complete HTML5 portfolio', completed: true },
+            { id: '2', text: 'Implement CSS Grid & Flexbox', completed: true },
+            { id: '3', text: 'Build interactive To-Do with localStorage', completed: false },
+          ];
+        }
+        // ensure each task has an id (migrate)
+        tasks = tasks.map(t => ({ ...t, id: t.id || String(Math.random() + Date.now()) }));
+        saveTasks();
+      }
 
-            <article class="card">
+      function saveTasks() {
+        localStorage.setItem('thiranex-tasks', JSON.stringify(tasks));
+        render();
+      }
 
-                <h3>Weather App</h3>
+      // Render tasks based on filter
+      function render() {
+        const filtered = tasks.filter(task => {
+          if (currentFilter === 'all') return true;
+          if (currentFilter === 'active') return !task.completed;
+          if (currentFilter === 'completed') return task.completed;
+          return true;
+        });
 
-                <p>
-                    JavaScript Weather Application using API.
-                </p>
+        if (filtered.length === 0) {
+          taskListEl.innerHTML = `<li class="task-item" style="justify-content:center; color:var(--text-muted); opacity:0.7; border-style:dashed;">
+            <span>✨ No tasks here</span>
+          </li>`;
+          return;
+        }
 
-            </article>
+        taskListEl.innerHTML = filtered.map(task => `
+          <li class="task-item" role="listitem" data-id="${task.id}">
+            <input type="checkbox" ${task.completed ? 'checked' : ''} aria-label="Toggle task completion">
+            <span class="task-text ${task.completed ? 'completed' : ''}">${escapeHTML(task.text)}</span>
+            <button class="delete-btn" aria-label="Delete task" title="Delete task">
+              <i class="fas fa-trash" aria-hidden="true"></i>
+            </button>
+          </li>
+        `).join('');
 
-            <article class="card">
+        // attach delegated events (event listeners on container)
+      }
 
-                <h3>Todo App</h3>
+      // Helper: escape HTML to prevent XSS
+      function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
 
-                <p>
-                    Task Management Application.
-                </p>
+      // ----- event delegation on taskList (for checkbox + delete) -----
+      taskListEl.addEventListener('change', function(e) {
+        const checkbox = e.target.closest('input[type="checkbox"]');
+        if (!checkbox) return;
+        const li = checkbox.closest('.task-item');
+        if (!li) return;
+        const id = li.dataset.id;
+        const task = tasks.find(t => t.id === id);
+        if (task) {
+          task.completed = checkbox.checked;
+          saveTasks();
+          // update filter button pressed state (optional)
+        }
+      });
 
-            </article>
+      taskListEl.addEventListener('click', function(e) {
+        const deleteBtn = e.target.closest('.delete-btn');
+        if (!deleteBtn) return;
+        const li = deleteBtn.closest('.task-item');
+        if (!li) return;
+        const id = li.dataset.id;
+        tasks = tasks.filter(t => t.id !== id);
+        saveTasks();
+      });
 
-        </div>
+      // Add task
+      addForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = taskInput.value.trim();
+        if (!text) return;
+        const newTask = {
+          id: String(Date.now() + Math.random()),
+          text: text,
+          completed: false
+        };
+        tasks.push(newTask);
+        saveTasks();
+        taskInput.value = '';
+        taskInput.focus();
+        // if filter is 'completed', switch to 'all' to see new task
+        if (currentFilter === 'completed') {
+          setFilter('all');
+        } else {
+          render();
+        }
+      });
 
-    </section>
+      // Filtering
+      function setFilter(filter) {
+        currentFilter = filter;
+        filterButtons.forEach(btn => {
+          const f = btn.dataset.filter;
+          const isActive = f === filter;
+          btn.classList.toggle('active', isActive);
+          btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+        render();
+      }
 
-</main>
+      filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const filter = this.dataset.filter;
+          setFilter(filter);
+        });
+      });
 
-<footer>
+      // initialise
+      loadTasks();
+      setFilter('all');
 
-    <p>
+      // also re-render on any external update (like localStorage changes from other tabs)
+      window.addEventListener('storage', function(e) {
+        if (e.key === 'thiranex-tasks') {
+          loadTasks();
+          setFilter(currentFilter);
+        }
+      });
 
-        © 2026 Akash Kumar | All Rights Reserved
+      // ---------- Contact form (ARIA demo) ----------
+      const contactForm = document.querySelector('form[aria-labelledby="contact-heading"]');
+      if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+          e.preventDefault();
+          const name = document.getElementById('contactName').value.trim();
+          const email = document.getElementById('contactEmail').value.trim();
+          if (!name || !email) {
+            alert('Please fill in both name and email.');
+            return;
+          }
+          alert(`Thank you, ${name}! (demo submission)`);
+          this.reset();
+        });
+      }
 
-    </p>
-
-</footer>
-
-<script src="js/theme.js"></script>
-
+    })();
+  </script>
 </body>
 </html>
